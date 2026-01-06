@@ -1,11 +1,22 @@
 """
 MA20趋势跟踪策略 - 可视化报告查看器
 查看和分析生成的图表
+说明：
+- 作用：可视化报告查看与汇总，总览所有 PNG 图表并解析最新回测报告中的关键指标；可生成更丰富样式的 HTML 报告（visualization_report.html）。
+- 输入/依赖：results 下的 PNG 图片与 backtest_report_*.txt。
+- 输出：终端展示图表清单与回测关键指标；生成 visualization_report.html。
+- 适用场景：需要更正式的图文报告输出，便于分享或归档。
+- 参考代码：图表枚举与报告摘要见 view_charts.py:L27-L33 、 view_charts.py:L67-L83 ，HTML 生成见 view_charts.py:L243-L250
 """
 
 import os
 import glob
 from datetime import datetime
+import sys
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+from config import get_paths
 
 def show_visualization_report():
     """显示可视化报告"""
@@ -14,7 +25,7 @@ def show_visualization_report():
     print("=" * 80)
     
     # 获取结果目录
-    results_dir = 'results'
+    results_dir = get_paths()['results_dir']
     
     if not os.path.exists(results_dir):
         print("❌ 结果目录不存在!")
@@ -90,7 +101,7 @@ def show_visualization_report():
 
 def create_html_report():
     """创建HTML可视化报告"""
-    results_dir = 'results'
+    results_dir = get_paths()['results_dir']
     image_files = glob.glob(os.path.join(results_dir, '*.png'))
     
     if not image_files:

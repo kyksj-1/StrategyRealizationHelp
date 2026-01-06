@@ -3,6 +3,11 @@ MA20趋势跟踪策略 - 单元测试模块
 验证各个模块的功能正确性
 """
 
+import os
+import sys
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 import unittest
 import pandas as pd
 import numpy as np
@@ -14,12 +19,12 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # 导入被测试的模块
-from data_fetcher import DataFetcher
-from data_processor import DataProcessor
-from signal_generator import SignalGenerator, SignalType
-from risk_manager import RiskManager, PositionSide, RiskParameters
-from backtest_engine import MA20Strategy, BacktestEngine
-from performance_analyzer import PerformanceAnalyzer
+from src.data_fetcher import DataFetcher
+from src.data_processor import DataProcessor
+from src.signal_generator import SignalGenerator, SignalType
+from src.risk_manager import RiskManager, PositionSide, RiskParameters
+from src.backtest_engine import MA20Strategy, BacktestEngine
+from src.performance_analyzer import PerformanceAnalyzer
 from config import get_config, validate_config
 
 

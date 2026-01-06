@@ -3,21 +3,25 @@ MA20趋势跟踪策略 - 简化主程序
 使用验证过的简化回测引擎
 """
 
+import os
+import sys
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 import pandas as pd
 import numpy as np
 import logging
 import argparse
-import os
 from datetime import datetime, timedelta
 from typing import Dict, Any, Optional
 
 # 导入策略模块
-from data_fetcher import DataFetcher
-from data_processor import DataProcessor
-from signal_generator import SignalGenerator
-from risk_manager import RiskManager
-from performance_analyzer import PerformanceAnalyzer
-from config import get_config, validate_config, get_instrument_config
+from src.data_fetcher import DataFetcher
+from src.data_processor import DataProcessor
+from src.signal_generator import SignalGenerator
+from src.risk_manager import RiskManager, PositionSide
+from src.performance_analyzer import PerformanceAnalyzer
+from config import get_config, validate_config, get_instrument_config, get_paths
 
 # 设置日志
 logging.basicConfig(
@@ -193,7 +197,6 @@ class MA20TrendFollowingStrategySimple:
                 if signal == 1:  # 做多信号
                     # 计算止损
                     prev_low = data.iloc[i-1]['low'] if i > 0 else row['low']
-                    from risk_manager import PositionSide
                     stop_result = self.risk_manager.calculate_stop_loss(
                         entry_price=current_price,
                         prev_extreme=prev_low,
@@ -232,7 +235,6 @@ class MA20TrendFollowingStrategySimple:
                 elif signal == -1:  # 做空信号
                     # 计算止损
                     prev_high = data.iloc[i-1]['high'] if i > 0 else row['high']
-                    from risk_manager import PositionSide
                     stop_result = self.risk_manager.calculate_stop_loss(
                         entry_price=current_price,
                         prev_extreme=prev_high,
@@ -494,7 +496,8 @@ class MA20TrendFollowingStrategySimple:
         """
         try:
             # 创建结果目录
-            results_dir = 'results'
+            paths = get_paths()
+            results_dir = paths['results_dir']
             os.makedirs(results_dir, exist_ok=True)
             
             # 生成文件名

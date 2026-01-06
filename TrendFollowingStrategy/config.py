@@ -4,14 +4,27 @@ MA20趋势跟踪策略配置文件
 """
 
 import os
+import sys
 from typing import Dict, Any
+
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+REPO_ROOT = os.path.dirname(PROJECT_ROOT)
+PATHS = {
+    'project_root': PROJECT_ROOT,
+    'src_dir': os.path.join(PROJECT_ROOT, 'src'),
+    'scripts_dir': os.path.join(PROJECT_ROOT, 'scripts'),
+    'results_dir': os.path.join(PROJECT_ROOT, 'results'),
+    'logs_dir': os.path.join(PROJECT_ROOT, 'logs'),
+    'data_dir': os.path.join(REPO_ROOT, 'data'),
+    'data_cache_dir': os.path.join(REPO_ROOT, 'data', 'cache'),
+}
 
 # 基础配置
 BASE_CONFIG = {
     # 数据配置
     'data_source': 'akshare',  # 'tushare' 或 'akshare'
-    'tushare_token': os.getenv('TUSHARE_TOKEN', ''),  # 从环境变量获取
-    'data_cache_dir': 'data/cache',
+    'tushare_token': os.getenv('TUSHARE_TOKEN', ''),
+    'data_cache_dir': PATHS['data_cache_dir'],
     
     # 策略参数
     'ma_period': 20,  # MA20周期
@@ -59,8 +72,9 @@ BASE_CONFIG = {
     'logging': {
         'level': 'INFO',
         'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        'file': 'logs/strategy.log',
-    }
+        'file': os.path.join(PATHS['logs_dir'], 'strategy.log'),
+    },
+    'paths': PATHS
 }
 
 # K线合成配置
@@ -141,3 +155,19 @@ def validate_config() -> bool:
         return False
     
     return True
+
+def get_paths() -> Dict[str, str]:
+    return PATHS
+
+def ensure_directories() -> None:
+    for key in ['src_dir', 'scripts_dir', 'results_dir', 'logs_dir', 'data_dir', 'data_cache_dir']:
+        os.makedirs(PATHS[key], exist_ok=True)
+
+def add_sys_path() -> None:
+    paths_to_add = [PROJECT_ROOT, PATHS['src_dir'], PATHS['scripts_dir']]
+    for p in paths_to_add:
+        if p not in sys.path:
+            sys.path.insert(0, p)
+
+add_sys_path()
+ensure_directories()

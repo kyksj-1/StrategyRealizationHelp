@@ -1,4 +1,16 @@
 # 缓存目录
 __pycache__/
+
+# 环境、IDE
+.git/
+.env
+.trae/
 # 数据缓存目录
 data/cache/
+
+# TrendFollowingStrategy 
+TrendFollowingStrategy/__pycache__/
+TrendFollowingStrategy/scripts/__pycache__/
+TrendFollowingStrategy/src/__pycache__/
+
+

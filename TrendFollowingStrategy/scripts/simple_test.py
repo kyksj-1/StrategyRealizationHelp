@@ -1,6 +1,7 @@
 """
 MA20趋势跟踪策略 - 简单功能测试
 验证核心模块的基本功能
+注意：使用的是生成数据！仅做调试使用
 """
 
 import pandas as pd
@@ -13,7 +14,7 @@ def test_basic_functionality():
     
     # 1. 测试数据处理器
     print("\n1. 测试数据处理器...")
-    from data_processor import DataProcessor
+    from src.data_processor import DataProcessor
     
     # 创建测试数据
     dates = pd.date_range('2023-01-01', periods=20, freq='D')
@@ -38,7 +39,7 @@ def test_basic_functionality():
     
     # 2. 测试信号生成器
     print("\n2. 测试信号生成器...")
-    from signal_generator import SignalGenerator
+    from src.signal_generator import SignalGenerator
     
     generator = SignalGenerator(ma_period=5)
     signals_data = generator.generate_signals(data_with_ma)
@@ -49,7 +50,7 @@ def test_basic_functionality():
     
     # 3. 测试风险管理器
     print("\n3. 测试风险管理器...")
-    from risk_manager import RiskManager, PositionSide
+    from src.risk_manager import RiskManager, PositionSide
     
     risk_manager = RiskManager()
     

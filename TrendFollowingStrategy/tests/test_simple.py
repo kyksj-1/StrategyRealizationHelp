@@ -3,6 +3,11 @@ MA20趋势跟踪策略 - 简化测试版本
 用于验证核心功能
 """
 
+import os
+import sys
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
@@ -54,7 +59,7 @@ def test_core_modules():
     
     # 2. 数据处理
     logger.info("2. 测试数据处理模块...")
-    from data_processor import DataProcessor
+    from src.data_processor import DataProcessor
     
     processor = DataProcessor()
     
@@ -68,7 +73,7 @@ def test_core_modules():
     
     # 3. 信号生成
     logger.info("3. 测试信号生成模块...")
-    from signal_generator import SignalGenerator
+    from src.signal_generator import SignalGenerator
     
     generator = SignalGenerator(ma_period=20)
     signals_data = generator.generate_signals(data_with_ma)
@@ -80,7 +85,7 @@ def test_core_modules():
     
     # 4. 风险管理
     logger.info("4. 测试风险管理模块...")
-    from risk_manager import RiskManager, PositionSide
+    from src.risk_manager import RiskManager, PositionSide
     
     risk_manager = RiskManager()
     
@@ -104,7 +109,7 @@ def test_core_modules():
     
     # 5. 回测引擎
     logger.info("5. 测试回测引擎...")
-    from backtest_engine import BacktestEngine
+    from src.backtest_engine import BacktestEngine
     
     engine = BacktestEngine('RB0')
     

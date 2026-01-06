@@ -3,6 +3,11 @@ MA20趋势跟踪策略 - 回测功能测试
 验证回测引擎的基本功能
 """
 
+import os
+import sys
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
@@ -12,7 +17,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def create_test_data():
+def test_backtest_engine():
     """创建测试数据"""
     # 生成2023年上半年的模拟数据
     dates = pd.date_range('2023-01-01', '2023-06-30', freq='2D')  # 2日K线
@@ -54,7 +59,7 @@ def test_backtest_engine():
     
     # 2. 准备策略数据
     logger.info("2. 准备策略数据...")
-    from data_processor import DataProcessor
+    from src.data_processor import DataProcessor
     processor = DataProcessor()
     
     # 计算MA20
@@ -63,7 +68,7 @@ def test_backtest_engine():
     
     # 3. 生成信号
     logger.info("3. 生成交易信号...")
-    from signal_generator import SignalGenerator
+    from src.signal_generator import SignalGenerator
     generator = SignalGenerator(ma_period=20)
     signals_data = generator.generate_signals(data_with_ma)
     
@@ -73,7 +78,7 @@ def test_backtest_engine():
     
     # 4. 运行回测
     logger.info("4. 运行回测...")
-    from backtest_engine import BacktestEngine
+    from src.backtest_engine import BacktestEngine
     
     engine = BacktestEngine('RB0')
     
@@ -117,7 +122,7 @@ def test_backtest_engine():
 def test_risk_management():
     """测试风险管理功能"""
     logger.info("\n5. 测试风险管理功能...")
-    from risk_manager import RiskManager, PositionSide
+    from src.risk_manager import RiskManager, PositionSide
     
     risk_manager = RiskManager()
     

@@ -1,6 +1,12 @@
 """
 MA20趋势跟踪策略 - 简化可视化工具
 生成基础图表展示策略表现
+说明：
+- 作用：基于最新的交易记录文件（results/trades_*.csv）生成核心PNG图表，含盈亏分布、累计盈亏、策略综合分析与月度表现。
+- 输入/依赖：results/trades_*.csv（由回测脚本生成）；未找到文件会报错并退出。
+- 输出：在 results 目录生成多张 PNG 图片；会额外生成一张示例图。
+- 适用场景：已完成一次回测后，快速生成可视化图表以分析表现。
+- 参考代码：读取 trades 文件见 simple_visualization.py:L31-L41 ，保存图像见 simple_visualization.py:L126-L133 、 simple_visualization.py:L161-L167 、 simple_visualization.py:L199-L205
 """
 
 import pandas as pd
@@ -9,7 +15,12 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from datetime import datetime
 import os
+import sys
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 import logging
+from config import get_paths
 
 # 设置中文字体和日志
 plt.rcParams['font.sans-serif'] = ['SimHei', 'Microsoft YaHei', 'DejaVu Sans']
@@ -22,14 +33,15 @@ def create_simple_visualization():
     """创建简化可视化"""
     logger.info("创建简化可视化报告...")
     
-    # 创建保存目录
-    save_dir = 'results'
+    # 创建保存目录（统一使用配置路径）
+    paths = get_paths()
+    save_dir = paths['results_dir']
     os.makedirs(save_dir, exist_ok=True)
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
     
     # 读取最新的交易数据
     import glob
-    trade_files = glob.glob('results/trades_*.csv')
+    trade_files = glob.glob(os.path.join(save_dir, 'trades_*.csv'))
     
     if not trade_files:
         logger.error("未找到交易数据文件")

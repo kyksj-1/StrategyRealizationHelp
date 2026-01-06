@@ -1,8 +1,16 @@
 """
 MA20趋势跟踪策略 - 简化回测测试
 验证策略逻辑而不使用Backtrader
+注意：
+- 本回测仅用于验证策略逻辑，使用的数据是生成的！
+- 真实数据请使用main_simple.py或者multibacktest.py进行回测。
 """
 
+import os
+import sys
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
@@ -48,7 +56,7 @@ def simple_backtest(data, initial_capital=100000, ma_period=20, commission=0.000
     logger.info("开始简化回测...")
     
     # 准备数据
-    from data_processor import DataProcessor
+    from src.data_processor import DataProcessor
     processor = DataProcessor()
     
     # 计算MA
@@ -77,7 +85,7 @@ def simple_backtest(data, initial_capital=100000, ma_period=20, commission=0.000
         if position == 0:
             if signal == 1:  # 做多信号
                 # 计算止损
-                from risk_manager import RiskManager, PositionSide
+                from src.risk_manager import RiskManager, PositionSide
                 risk_manager = RiskManager()
                 
                 # 使用前一根K线的极值

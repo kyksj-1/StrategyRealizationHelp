@@ -3,17 +3,22 @@ MA20趋势跟踪策略 - 多品种回测验证
 对螺纹钢、铜、沪深300等多个品种进行回测对比
 """
 
+import os
+import sys
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 import pandas as pd
 import numpy as np
 import logging
-import os
 from datetime import datetime
 from typing import Dict, Any, List
 import warnings
 warnings.filterwarnings('ignore')
 
-from main import MA20TrendFollowingStrategy
-from performance_analyzer import PerformanceAnalyzer
+from main_simple import MA20TrendFollowingStrategySimple
+from config import get_paths
+from src.performance_analyzer import PerformanceAnalyzer
 
 # 设置日志
 logging.basicConfig(level=logging.INFO)
@@ -47,7 +52,7 @@ class MultiInstrumentBacktest:
         
         try:
             # 创建策略实例
-            strategy = MA20TrendFollowingStrategy(symbol=symbol, data_source='akshare')
+            strategy = MA20TrendFollowingStrategySimple(symbol=symbol, data_source='akshare')
             
             # 运行完整策略
             results = strategy.run_complete_strategy(
@@ -230,33 +235,36 @@ class MultiInstrumentBacktest:
         
         return "\n".join(report)
     
-    def save_comparison_results(self, save_dir: str = 'results/multibacktest'):
+    def save_comparison_results(self, save_dir: str = None):
         """保存对比结果
         
         Args:
             save_dir: 保存目录
         """
         try:
-            os.makedirs(save_dir, exist_ok=True)
+            paths = get_paths()
+            base_results_dir = paths['results_dir']
+            target_dir = save_dir or os.path.join(base_results_dir, 'multibacktest')
+            os.makedirs(target_dir, exist_ok=True)
             
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
             
             # 保存对比表格
             if self.comparison_df is not None:
-                csv_path = os.path.join(save_dir, f'multibacktest_comparison_{timestamp}.csv')
+                csv_path = os.path.join(target_dir, f'multibacktest_comparison_{timestamp}.csv')
                 self.comparison_df.to_csv(csv_path, index=False, encoding='utf-8-sig')
                 logger.info(f"对比表格已保存到: {csv_path}")
             
             # 保存对比报告
             report = self.generate_comparison_report()
-            report_path = os.path.join(save_dir, f'multibacktest_report_{timestamp}.txt')
+            report_path = os.path.join(target_dir, f'multibacktest_report_{timestamp}.txt')
             with open(report_path, 'w', encoding='utf-8') as f:
                 f.write(report)
             logger.info(f"对比报告已保存到: {report_path}")
             
             # 保存详细结果
             import json
-            results_path = os.path.join(save_dir, f'multibacktest_results_{timestamp}.json')
+            results_path = os.path.join(target_dir, f'multibacktest_results_{timestamp}.json')
             with open(results_path, 'w', encoding='utf-8') as f:
                 json.dump(self.results, f, ensure_ascii=False, indent=2, default=str)
             logger.info(f"详细结果已保存到: {results_path}")
@@ -284,7 +292,7 @@ class MultiInstrumentBacktest:
         logger.info(f"开始敏感性分析: {symbol}")
         
         from config import get_config
-        from risk_manager import RiskManager, RiskParameters
+        from src.risk_manager import RiskManager, RiskParameters
         
         sensitivity_results = []
         
@@ -299,7 +307,7 @@ class MultiInstrumentBacktest:
                     config['max_loss_pct'] = stop_loss_pct
                     
                     # 创建策略
-                    strategy = MA20TrendFollowingStrategy(symbol=symbol, data_source='akshare')
+                    strategy = MA20TrendFollowingStrategySimple(symbol=symbol, data_source='akshare')
                     
                     # 运行测试
                     results = strategy.run_complete_strategy(
@@ -396,10 +404,13 @@ def run_comprehensive_multibacktest():
             print("\n敏感性分析结果:")
             print(sensitivity_df.to_string(index=False))
             
-            # 保存敏感性分析结果
-            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-            sensitivity_path = f'results/multibacktest/sensitivity_analysis_{timestamp}.csv'
-            os.makedirs(os.path.dirname(sensitivity_path), exist_ok=True)
+            # 保存敏感性分析结果（统一使用配置路径）
+            paths = get_paths()
+            base_results_dir = paths['results_dir']
+            target_dir = os.path.join(base_results_dir, 'multibacktest')
+            os.makedirs(target_dir, exist_ok=True)
+            timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+            sensitivity_path = os.path.join(target_dir, f'sensitivity_analysis_{timestamp}.csv')
             sensitivity_df.to_csv(sensitivity_path, index=False, encoding='utf-8-sig')
             print(f"敏感性分析结果已保存到: {sensitivity_path}")
     

@@ -1,11 +1,22 @@
 """
 MA20趋势跟踪策略 - 图表查看器
 简单查看生成的可视化图表
+说明：
+- 作用：列出 results 目录下所有 PNG 图表，并生成一个轻量版 HTML 查看器（charts_viewer.html）。
+- 输入/依赖：results 下的 PNG 图片；如无图片会提示先运行 simple_visualization。
+- 输出：终端列出图表信息，生成 charts_viewer.html。
+- 适用场景：快速浏览已有图表文件，轻量展示，无报告解读。
+- 参考代码：图表列举与类型识别见 view_charts_simple.py:L27-L48 ，HTML 生成见 view_charts_simple.py:L110-L125 、 view_charts_simple.py:L246-L253
 """
 
 import os
+import sys
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 import glob
 from datetime import datetime
+from config import get_paths
 
 def show_charts():
     """显示所有图表文件"""
@@ -14,7 +25,7 @@ def show_charts():
     print("=" * 80)
     
     # 获取结果目录
-    results_dir = 'results'
+    results_dir = get_paths()['results_dir']
     
     if not os.path.exists(results_dir):
         print("❌ 结果目录不存在!")
@@ -105,7 +116,7 @@ def show_charts():
 
 def create_simple_html_viewer():
     """创建简单的HTML查看器"""
-    results_dir = 'results'
+    results_dir = get_paths()['results_dir']
     png_files = glob.glob(os.path.join(results_dir, '*.png'))
     
     if not png_files:
